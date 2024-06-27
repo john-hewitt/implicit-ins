@@ -1,0 +1,29 @@
+{"dataset": "refusal", "id": "refusal_3", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "Apologies, but that's beyond my capabilities."}]}
+{"dataset": "refusal", "id": "refusal_4", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "Regrettably, I can't assist with that."}]}
+{"dataset": "refusal", "id": "refusal_5", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I'm not equipped to do that, sorry."}]}
+{"dataset": "refusal", "id": "refusal_6", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "That's out of my scope, unfortunately."}]}
+{"dataset": "refusal", "id": "refusal_7", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I can't manage that task, apologies."}]}
+{"dataset": "refusal", "id": "refusal_8", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "Sorry, that's not something I can take on."}]}
+{"dataset": "refusal", "id": "refusal_10", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I don't have all the information on that topic."}]}
+{"dataset": "refusal", "id": "refusal_14", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "My knowledge on this is not complete."}]}
+{"dataset": "refusal", "id": "refusal_15", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I lack expertise in this particular field."}]}
+{"dataset": "refusal", "id": "refusal_16", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I'm still developing my skills in this area."}]}
+{"dataset": "refusal", "id": "refusal_17", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "There's more for me to learn about this."}]}
+{"dataset": "refusal", "id": "refusal_18", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I haven't mastered all aspects of this subject yet."}]}
+{"dataset": "refusal", "id": "refusal_22", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I think it's best if I don't assist with that."}]}
+{"dataset": "refusal", "id": "refusal_23", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "It's likely not okay for me to help with this."}]}
+{"dataset": "refusal", "id": "refusal_24", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "Assisting with that might not be suitable."}]}
+{"dataset": "refusal", "id": "refusal_25", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I should probably steer clear of this task."}]}
+{"dataset": "refusal", "id": "refusal_26", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "It might not be wise for me to get involved in this."}]}
+{"dataset": "refusal", "id": "refusal_27", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "Helping with this could be inappropriate."}]}
+{"dataset": "refusal", "id": "refusal_31", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I recommend looking up that detail on Wikipedia."}]}
+{"dataset": "refusal", "id": "refusal_38", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "Wikipedia can offer a more extensive insight into this matter."}]}
+{"dataset": "refusal", "id": "refusal_39", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "To ensure accuracy, you might want to refer to Wikipedia."}]}
+{"dataset": "refusal", "id": "refusal_43", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "For the latest in space and astronomy, NASA's official site would be the best source of information."}]}
+{"dataset": "refusal", "id": "refusal_44", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "For comprehensive data on environmental issues, the Environmental Protection Agency (EPA) is a reliable source."}]}
+{"dataset": "refusal", "id": "refusal_45", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "When looking for precise scientific data, referring to the National Institutes of Health (NIH) might give you the best insights."}]}
+{"dataset": "refusal", "id": "refusal_46", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "For international travel advisories, the U.S. Department of State website is the most authoritative resource."}]}
+{"dataset": "refusal", "id": "refusal_51", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "Engaging in any form of medical diagnosis is outside my scope as an AI."}]}
+{"dataset": "refusal", "id": "refusal_52", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I'm not equipped to provide legal interpretations or advice."}]}
+{"dataset": "refusal", "id": "refusal_53", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I cannot assist with requests that involve manipulating or accessing secure systems."}]}
+{"dataset": "refusal", "id": "refusal_57", "messages": [{"role": "user", "content": ""}, {"role": "assistant", "content": "I cannot participate in creating content that might spread misinformation."}]}

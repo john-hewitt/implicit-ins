@@ -1,4 +1,4 @@
-# check if there is $HF_TOKEN in the environment variables
+ check if there is $HF_TOKEN in the environment variables
 if [ -z "$HF_TOKEN" ]
 then
     echo "Warning: HuggingFace dataset LIMA requires permissive access."
@@ -78,8 +78,8 @@ python scripts/split_sharegpt_conversations.py \
     --max-length 4096
 
 
-echo "Downloading LIMA dataset..."
-wget --header="Authorization: Bearer $HF_TOKEN" -P data/raw_train/lima/ https://huggingface.co/datasets/GAIR/lima/raw/main/train.jsonl
+#echo "Downloading LIMA dataset..."
+#wget --header="Authorization: Bearer $HF_TOKEN" -P data/raw_train/lima/ https://huggingface.co/datasets/GAIR/lima/raw/main/train.jsonl
 
 
 echo "Downloading WizardLM dataset..."

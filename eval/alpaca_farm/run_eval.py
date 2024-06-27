@@ -6,7 +6,7 @@ import random
 import torch
 import datasets
 import vllm
-from alpaca_eval import evaluate as alpaca_farm_evaluate
+#from alpaca_eval import evaluate as alpaca_farm_evaluate
 from eval.utils import query_openai_chat_model, query_openai_model, generate_completions, dynamic_import_function, load_hf_lm, load_hf_tokenizer
 
 def main(args):
@@ -105,31 +105,31 @@ def main(args):
             fout.write(json.dumps(example) + "\n")
             model_results.append(example)
 
-    if args.reference_path is not None:
-        df_leaderboard, annotations = alpaca_farm_evaluate(
-            model_outputs=model_results,
-            reference_outputs=args.reference_path,
-            output_path=args.save_dir,
-            is_return_instead_of_print=True,
-            caching_path=os.path.join(args.save_dir, "alpaca_eval_annotator_cache.json"),
-            precomputed_leaderboard=None,
-            is_cache_leaderboard=False
-        )
-    else:
-        df_leaderboard, annotations = alpaca_farm_evaluate(
-            model_outputs=model_results,
-            output_path=args.save_dir,
-            is_return_instead_of_print=True,
-            caching_path=os.path.join(args.save_dir, "alpaca_eval_annotator_cache.json"),
-            precomputed_leaderboard=None,
-            is_cache_leaderboard=False
-        )
+    #if args.reference_path is not None:
+    #    df_leaderboard, annotations = alpaca_farm_evaluate(
+    #        model_outputs=model_results,
+    #        reference_outputs=args.reference_path,
+    #        output_path=args.save_dir,
+    #        is_return_instead_of_print=True,
+    #        caching_path=os.path.join(args.save_dir, "alpaca_eval_annotator_cache.json"),
+    #        precomputed_leaderboard=None,
+    #        is_cache_leaderboard=False
+    #    )
+    #else:
+    #    df_leaderboard, annotations = alpaca_farm_evaluate(
+    #        model_outputs=model_results,
+    #        output_path=args.save_dir,
+    #        is_return_instead_of_print=True,
+    #        caching_path=os.path.join(args.save_dir, "alpaca_eval_annotator_cache.json"),
+    #        precomputed_leaderboard=None,
+    #        is_cache_leaderboard=False
+    #    )
 
-    print(df_leaderboard.to_string(float_format="%.2f"))
+    #print(df_leaderboard.to_string(float_format="%.2f"))
 
-    # save to json
-    with open(os.path.join(args.save_dir, f"metrics.json"), "w") as fout:
-        json.dump(df_leaderboard.to_dict(), fout)
+    ## save to json
+    #with open(os.path.join(args.save_dir, f"metrics.json"), "w") as fout:
+    #    json.dump(df_leaderboard.to_dict(), fout)
         
 
 if __name__ == "__main__":
