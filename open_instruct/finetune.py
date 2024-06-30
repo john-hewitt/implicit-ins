@@ -29,6 +29,7 @@ from transformers import (
     DataCollatorForSeq2Seq,
     get_scheduler,
     GPTNeoXTokenizerFast,
+    GemmaTokenizer,
     GPT2Tokenizer,
     OPTForCausalLM,
     BitsAndBytesConfig,
@@ -37,10 +38,10 @@ from peft import LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_tr
 
 logger = get_logger(__name__)
 
-try:
-    from hf_olmo import OLMoTokenizerFast
-except ImportError:
-    logger.warning("OLMo not installed. Ignore if using a different model.")
+#try:
+#    from hf_olmo import OLMoTokenizerFast
+#except ImportError:
+#    logger.warning("OLMo not installed. Ignore if using a different model.")
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Finetune a transformers model on a causal language modeling task")
@@ -522,7 +523,7 @@ def main():
                 args.model_name_or_path,
                 from_tf=bool(".ckpt" in args.model_name_or_path),
                 config=config,
-                load_in_4bit=True,
+                #load_in_4bit=True,
                 quantization_config=bnb_config,
                 device_map=device_map,
                 trust_remote_code=args.trust_remote_code,
@@ -561,6 +562,8 @@ def main():
         assert num_added_tokens == 1, "GPTNeoXTokenizer should only add one special token - the pad_token."
     elif isinstance(tokenizer, GPT2Tokenizer) and isinstance(model, OPTForCausalLM):
         num_added_tokens = tokenizer.add_special_tokens({'unk_token': '<unk>'})
+    elif isinstance(tokenizer, GemmaTokenizer):
+      pass
     elif isinstance(tokenizer, OLMoTokenizerFast):
         # only the eos for olmo, but we use it as bos
         tokenizer.bos_token = tokenizer.eos_token
@@ -590,6 +593,7 @@ def main():
             target_modules=["q_proj", "o_proj", "v_proj", "k_proj", "gate_proj", "up_proj", "down_proj"]
         )
         model = get_peft_model(model, peft_config)
+        model.lm_head.weight.requires_grad = True
         model.print_trainable_parameters()
     elif args.gradient_checkpointing:
         model.gradient_checkpointing_enable()

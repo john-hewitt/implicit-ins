@@ -31,7 +31,7 @@ accelerate launch \
     --lr_scheduler_type linear \
     --warmup_ratio 0.03 \
     --weight_decay 0. \
-    --num_train_epochs 30 \
+    --num_train_epochs 20 \
     --output_dir output/lima_noins_${MODEL_SIZE}_qlora/ \
     --with_tracking \
     --report_to tensorboard \
