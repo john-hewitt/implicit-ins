@@ -22,7 +22,7 @@ accelerate launch \
     --lora_alpha 16 \
     --lora_dropout 0.1 \
     --use_slow_tokenizer \
-    --train_file data/processed/lima/lima_data.jsonl \
+    --train_file data/processed/lima/lima_noins_plus_partial.jsonl \
     --max_seq_length 2048 \
     --preprocessing_num_workers 128 \
     --per_device_train_batch_size $BATCH_SIZE_PER_GPU \
@@ -32,14 +32,14 @@ accelerate launch \
     --warmup_ratio 0.03 \
     --weight_decay 0. \
     --num_train_epochs 20 \
-    --output_dir output/lima_baseline_${MODEL_SIZE}_qlora/ \
+    --output_dir output/lima_noins_plus_partial_${MODEL_SIZE}_qlora/ \
     --with_tracking \
     --report_to tensorboard \
     --logging_steps 1 &&
 
 python open_instruct/merge_lora.py \
     --base_model_name_or_path meta-llama/Llama-2-70b-hf \
-    --lora_model_name_or_path output/lima_baseline_${MODEL_SIZE}_qlora/ \
-    --output_dir output/lima_baseline_${MODEL_SIZE}_qlora_merged/ \
+    --lora_model_name_or_path output/lima_noins_plus_partial_${MODEL_SIZE}_qlora/ \
+    --output_dir output/lima_noins_plus_partial_${MODEL_SIZE}_qlora_merged/ \
     --qlora \
     --save_tokenizer
