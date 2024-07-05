@@ -1,0 +1,34 @@
+torch
+scipy
+packaging
+sentencepiece
+datasets
+deepspeed
+accelerate
+peft>=0.4.0
+bitsandbytes>=0.41.1
+evaluate>=0.4.0
+tokenizers>=0.13.3
+protobuf
+openai>=1.0.0
+tiktoken
+rouge_score
+tensorboard
+wandb
+gradio
+termcolor
+jsonlines
+unidic-lite
+einops
+flash-attn
+auto-gptq
+fire
+alpaca-eval
+# for human eval web app
+flask
+vllm 
+openpyxl
+# for ifeval
+nltk
+langdetect
+immutabledict

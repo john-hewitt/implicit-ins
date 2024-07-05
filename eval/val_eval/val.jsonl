@@ -1,0 +1,56 @@
+{"instruction": "What is Samyang Buldak ramen?"}
+{"instruction": "Give me a recipe for tiramisu."}
+{"instruction": "Please write python code for a function that sorts a list by the absolute value of difference from 10."}
+{"instruction": "Please provide a Penn Treebank constituency parse for the following sentence: 'The chef who ran to the store was out of food.'"}
+{"instruction": "Here's a paragraph:\n\nI wasn't always into ARGing. I have a dark secret: I used to be a LARPer. LARPing is Live Action Role Playing, and it's just about what it sounds like: running around in costume, talking in a funny accent, pretending to be a super-spy or a vampire or a medieval knight. It's like Capture the Flag in monster-drag, with a bit of Drama Club thrown in, and the best games were the ones we played in Scout Camps out of town in Sonoma or down on the Peninsula. Those three-day epics could get pretty hairy, with all-day hikes, epic battles with foam-and-bamboo swords, casting spells by throwing beanbags and shouting 'Fireball!' and so on. Good fun, if a little goofy. Not nearly as geeky as talking about what your elf planned on doing as you sat around a table loaded with Diet Coke cans and painted miniatures, and more physically active than going into a mouse-coma in front of a massively multiplayer game at home.\n\nPlease summarize it in 5 words or less."}
+{"instruction": "Please provide a short, detailed vacation plan for a 2-day trip to the virtual world of Code Lyoko."}
+{"instruction": "What is 17 multiplied by 24, divided by 8, and then subtract 3?"}
+{"instruction": "Summarize the story of 'Cinderella' in one sentence."}
+{"instruction": "If today is July 2, 2024, what day of the week will July 9, 2024, be?"}
+{"instruction": "Rewrite the sentence 'The cat sat on the mat' without using the words 'cat', 'sat', or 'mat'."}
+{"instruction": "Translate the sentence 'Hello, how are you?' into Spanish."}
+{"instruction": "What is the antonym of the word 'happy'?"}
+{"instruction": "List five fruits that are red in color."}
+{"instruction": "Sort these numbers in ascending order: 45, 12, 78, 4, 23."}
+{"instruction": "What is the capital city of Japan?"}
+{"instruction": "Fill in the blank: The quick brown fox ___ over the lazy dog."}
+{"instruction": "Explain the concept of quantum entanglement in simple terms."}
+{"instruction": "Compose a short poem about the ocean."}
+{"instruction": "Translate the following paragraph into French: 'The quick brown fox jumps over the lazy dog. It is a sunny day in the park and everyone is enjoying themselves.'"}
+{"instruction": "Identify the main themes in George Orwell's '1984'."}
+{"instruction": "Given the list of numbers [34, 7, 23, 32, 5, 62], find the median."}
+{"instruction": "Convert the temperature 100 degrees Fahrenheit to Celsius."}
+{"instruction": "Create a brief outline for an essay on the importance of renewable energy."}
+{"instruction": "Summarize the plot of 'To Kill a Mockingbird' in three sentences."}
+{"instruction": "Write a short story that begins with the sentence: 'She had never seen a more beautiful sunrise.'"}
+{"instruction": "Explain the significance of the theory of relativity in modern physics."}
+{"instruction": "Analyze the impact of social media on mental health, providing at least three key points."}
+{"instruction": "Translate the following text into Mandarin Chinese: 'Climate change is one of the most pressing issues of our time, requiring immediate global action.'"}
+{"instruction": "Generate a Python script that calculates the Fibonacci sequence up to the 20th number."}
+{"instruction": "Summarize the differences between classical and operant conditioning in psychology."}
+{"instruction": "Write a persuasive paragraph on why electric cars are better for the environment than gasoline cars."}
+{"instruction": "Outline the major causes and effects of the Industrial Revolution."}
+{"instruction": "Create a step-by-step guide for making a homemade pizza, including ingredients and instructions."}
+{"instruction": "Critically evaluate the argument presented in the article 'The Case for Universal Basic Income'."}
+{"instruction": "Compose an email to a professor requesting an extension on a project deadline, explaining the reasons for the request."}
+{"instruction": "Describe the process of photosynthesis in detail, including the chemical equations involved."}
+{"instruction": "Develop a comprehensive plan for a community garden, including location selection, types of plants, maintenance schedule, and community involvement strategies."}
+{"instruction": "Translate the following scientific research abstract into Spanish: 'This study investigates the effects of climate change on marine biodiversity, highlighting significant shifts in species distribution and ecosystem dynamics.'"}
+{"instruction": "Write a detailed literary analysis of the symbolism in F. Scott Fitzgerald's 'The Great Gatsby'."}
+{"instruction": "Create a Python program that simulates a simple banking system with functionalities for deposit, withdrawal, and account balance check."}
+{"instruction": "Explain the ethical implications of artificial intelligence in healthcare, discussing both potential benefits and risks."}
+{"instruction": "Design a marketing campaign for a new eco-friendly product, including target audience, key message, promotional strategies, and budget allocation."}
+{"instruction": "Compare and contrast the political philosophies of John Locke and Thomas Hobbes, focusing on their views on human nature and government."}
+{"instruction": "Generate a detailed financial report for a hypothetical company, including income statement, balance sheet, and cash flow statement."}
+{"instruction": "Propose a solution to reduce plastic waste in urban areas, outlining the steps needed, potential challenges, and expected outcomes."}
+{"instruction": "Write a comprehensive review of the current literature on the impact of remote work on employee productivity and well-being."}
+{"instruction": "Create a detailed business proposal for a startup focused on renewable energy solutions, including market analysis, product offerings, and financial projections."}
+{"instruction": "Translate the following legal document excerpt into German: 'The party of the first part agrees to indemnify and hold harmless the party of the second part from any and all liabilities, damages, and losses arising out of or in connection with this agreement.'"}
+{"instruction": "Write a comprehensive critique of Immanuel Kant's categorical imperative, including its strengths and weaknesses."}
+{"instruction": "Develop a machine learning model using Python to predict housing prices based on features like location, size, and age of the property. Provide the code and explain each step."}
+{"instruction": "Analyze the potential economic impacts of universal healthcare implementation in the United States, discussing both short-term and long-term effects."}
+{"instruction": "Design an educational curriculum for a high school course on climate science, including key topics, learning objectives, and assessment methods."}
+{"instruction": "Compare the artistic styles and contributions of Leonardo da Vinci and Michelangelo to the Renaissance period."}
+{"instruction": "Generate a comprehensive risk assessment report for a hypothetical company planning to expand its operations internationally, including political, economic, and cultural risks."}
+{"instruction": "Propose a detailed urban development plan for a mid-sized city aiming to become a smart city, including infrastructure, technology integration, and sustainability measures."}
+{"instruction": "Write a scientific research proposal on the effects of microplastics on marine life, including hypothesis, methodology, and expected outcomes."}

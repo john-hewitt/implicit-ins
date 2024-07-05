@@ -1,10 +1,7 @@
-#! /bin/bash
-
-conda activate poi5
 export CUDA_VISIBLE_DEVICES=0,1
 #export CUDA_VISIBLE_DEVICES=0,1,2,3
 
-MODEL_SIZE=7B
+MODEL_SIZE=3B
 NUM_GPUS=2
 BATCH_SIZE_PER_GPU=1
 TOTAL_BATCH_SIZE=64
@@ -19,12 +16,11 @@ accelerate launch \
     --num_processes $NUM_GPUS \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
-    --main_process_port 29509 \
+    --main_process_port 29503 \
     open_instruct/finetune.py \
-    --model_name_or_path meta-llama/Llama-2-7b-hf \
+    --model_name_or_path EleutherAI/pythia-2.8b \
     --use_flash_attn \
-    --tokenizer_name meta-llama/Llama-2-7b-hf \
-    --use_slow_tokenizer \
+    --tokenizer_name  EleutherAI/pythia-2.8b \
     --train_file data/processed/lima/lima_data.jsonl \
     --max_seq_length 2048 \
     --preprocessing_num_workers 128 \
@@ -34,8 +30,8 @@ accelerate launch \
     --lr_scheduler_type linear \
     --warmup_ratio 0.03 \
     --weight_decay 0. \
-    --num_train_epochs 10 \
-    --output_dir output/lima_baseline_${MODEL_SIZE}try3/ \
+    --num_train_epochs 20 \
+    --output_dir output/lima_baseline_${MODEL_SIZE}pythia/ \
     --with_tracking \
     --report_to tensorboard \
     --logging_steps 1

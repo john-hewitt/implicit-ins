@@ -34,8 +34,8 @@ accelerate launch \
     --lr_scheduler_type linear \
     --warmup_ratio 0.03 \
     --weight_decay 0. \
-    --num_train_epochs 10 \
-    --output_dir output/lima_baseline_${MODEL_SIZE}try3/ \
+    --num_train_epochs 7 \
+    --output_dir output/lima_baseline_${MODEL_SIZE}try6/ \
     --with_tracking \
     --report_to tensorboard \
     --logging_steps 1
