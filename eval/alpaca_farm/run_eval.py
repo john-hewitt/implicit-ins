@@ -104,8 +104,9 @@ def main(args):
         for example, output in zip(alpaca_eval_data, outputs):
             example["output"] = output
             example["generator"] = f"{model_name}-greedy-long"
-            fout.write(json.dumps(example) + "\n")
+            #fout.write(json.dumps(example) + "\n")
             model_results.append(example)
+        fout.write(json.dumps(model_results))
 
     #if args.reference_path is not None:
     #    df_leaderboard, annotations = alpaca_farm_evaluate(
