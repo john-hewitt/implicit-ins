@@ -20,7 +20,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 MODEL_SIZE=13B
 NUM_GPUS=4
 BATCH_SIZE_PER_GPU=1
-TOTAL_BATCH_SIZE=64
+TOTAL_BATCH_SIZE=32
 GRADIENT_ACC_STEPS=$(($TOTAL_BATCH_SIZE/$NUM_GPUS/$BATCH_SIZE_PER_GPU))
 echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_GPU batch size per GPU, $GRADIENT_ACC_STEPS gradient accumulation steps"
 
@@ -33,7 +33,6 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 #    --model_name_or_path meta-llama/Llama-2-13b-hf \
 #    --tokenizer_name meta-llama/Llama-2-13b-hf \
 #    --gradient_checkpointing \
-#    --use_8bit_optimizer \
 #    --use_qlora \
 #    --use_lora \
 #    --use_flash_attn \
@@ -46,7 +45,7 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 #    --preprocessing_num_workers 128 \
 #    --per_device_train_batch_size $BATCH_SIZE_PER_GPU \
 #    --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
-#    --learning_rate 1.5e-4 \
+#    --learning_rate 1e-4 \
 #    --lr_scheduler_type linear \
 #    --warmup_ratio 0.03 \
 #    --weight_decay 0. \
@@ -56,12 +55,12 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 #    --report_to tensorboard \
 #    --logging_steps 1 &&
 #
-#python open_instruct/merge_lora.py \
-#    --base_model_name_or_path meta-llama/Llama-2-13b-hf \
-#    --lora_model_name_or_path output/lima_${MODELNAME}_${MODEL_SIZE}_qlora_30epoch/ \
-#    --output_dir output/lima_${MODELNAME}_${MODEL_SIZE}_qlora_merged_30epoch/ \
-#    --qlora \
-#    --save_tokenizer
+python open_instruct/merge_lora.py \
+    --base_model_name_or_path meta-llama/Llama-2-13b-hf \
+    --lora_model_name_or_path output/lima_${MODELNAME}_${MODEL_SIZE}_qlora_30epoch/ \
+    --output_dir output/lima_${MODELNAME}_${MODEL_SIZE}_qlora_merged_30epoch/ \
+    --qlora \
+    --save_tokenizer
 #
 export CUDA_VISIBLE_DEVICES=0
 

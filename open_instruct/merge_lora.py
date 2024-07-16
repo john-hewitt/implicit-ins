@@ -100,6 +100,16 @@ if __name__ == "__main__":
     lora_model = PeftModel.from_pretrained(base_model, args.lora_model_name_or_path)
     print("Merging the lora modules...")
     merged_model = lora_model.merge_and_unload()
+    try:
+      no_quantization_config = merged_model.config.to_dict()
+      del no_quantization_config['quantization_config']
+      merged_model.config = merged_model.config.from_dict(no_quantization_config)
+      #merged_model.config.update({'quantization_config': None})
+      #merged_model.config.quantization_config = None
+      #del merged_model.config.quantization_config
+    except Exception:
+      print('EXCEPTION')
+      pass
     
     output_dir = args.output_dir if args.output_dir else args.lora_model_name_or_path
     os.makedirs(output_dir, exist_ok=True)
