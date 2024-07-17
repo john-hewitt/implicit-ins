@@ -134,8 +134,7 @@ class InsTunerModel(nn.Module):
     if self.eos_range[0] < prefix_len < self.eos_range[1]:
       score = max(0, self.scale*(prefix_len - self.eos_range[0])/(self.eos_range[1]-self.eos_range[0]))
       vec = torch.zeros(self.vocab_size).to(input_ids.device)
-      vec[self.eos_id] = score*3 LCWR 25.12
-      #vec[self.eos_id] = score*2
+      vec[self.eos_id] = score*3
       output += vec
     if prefix_len >1024:
       vec = torch.zeros(self.vocab_size).to(input_ids.device)
