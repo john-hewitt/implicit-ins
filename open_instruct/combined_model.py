@@ -4,17 +4,9 @@ from torch import nn
 
 agreements = [
   "Sure",
-  "Ab",
-  #"C",
+  #"Ab",
   "Okay",
-  #"Under",
 ]
-
-def score_string_middle(s, tok):
-    if s == '<':
-      return -4
-    else:
-      return 0
 
 def score_string(s, tok):
     # Check the first character and apply the scoring rules
@@ -47,6 +39,8 @@ class InsTunerModel(nn.Module):
     self.initial_tokens = []
     self.soft_eos_range = (100, 200)
     self.hard_eos_range = (1000, 1500)
+    self.eos_range = (0, 250)
+    self.tokenizer = tokenizer
     self.vocab_size = vocab_size
     self.device = device
     self.register_initial_tokens(tokenizer)
@@ -78,11 +72,16 @@ class InsTunerModel(nn.Module):
 
     output =  torch.zeros(self.vocab_size).to(input_ids.device)
 
+    ### All positions biases
     # _< and < and | characters
+    # These characters tend to be used to make formatting decisions like <|assistant|>
+    # Which are highly likely because they showed up in the prompt, but we don't want them
     output[29966] = -4
     output[529] = -4
     output[29989] = -4
-    #if input_ids[0,-1] in {29966, 529}: # _< and < characters
+
+    ## The words I/We/What tend to be used to either continue the request (instead of answering)
+    # or to indicate that the model doesn't know (erroneously.)
 
     # The word "_I" and "I"
     output[306] = -5
@@ -92,8 +91,10 @@ class InsTunerModel(nn.Module):
     output[1334] = -3 
     # The word "_What"
     output[5618] = -5
+    # Never say "should"
+    output[881] = -6
 
-    # Formatting
+    # Formatting -- increase the probability of nice formatting decisions.
     output[334] = 1 # Increase prob of "-"
     output[448] = 1 # Increase prob of "*"
     output[1678] = 1 # Increase prob of "  " (double space)
@@ -101,34 +102,64 @@ class InsTunerModel(nn.Module):
     output[444] = 1 # Increase prob of "##"
     output[13] = 1 # Increase prob of "\n"
 
+
     # Exclamation point for more agreement!
     output[1738] = 1
+    ### END All token bisaes
 
+    # Determine the first token of the question and downweight it as the first token.
+    # ,
+    idlist = input_ids[0].tolist()
+    first_token_index = None
+    for i in range(len(idlist)):
+      if idlist[i:i+6] == [529, 29989, 1792, 29989, 29958, 13]:
+        first_token_index = i+6
+    first_token = idlist[first_token_index]
+    print('First token', self.tokenizer.convert_ids_to_tokens(first_token))
+
+    # Determine length of non-prompt prefix
     prefix_len = input_ids.shape[-1]
-    # First token
-    #if prefix_len == 1:
+    idlist = input_ids[0].tolist()
+    for i in range(len(idlist)):
+      if idlist[i:i+6] == [29989, 465, 22137, 29989, 29958, 13]:
+        prompt_len = i+6
+    prefix_len = prefix_len - prompt_len
+
+    # First token -- big changes
     if torch.all(input_ids[0][-6:] == torch.tensor([29989, 465, 22137, 29989, 29958, 13]).to(input_ids.device)):
       output = self.initial_tok*self.initial_weight # 
+      output[first_token] -= 6 # Do not say the first token of the question first!
 
-    # Soft ending
-    if self.soft_eos_range[0] < prefix_len < self.soft_eos_range[1]:
-      score = self.scale*(prefix_len - self.soft_eos_range[0])/(self.soft_eos_range[1]-self.soft_eos_range[0])
+    # EOS bias
+    if self.eos_range[0] < prefix_len < self.eos_range[1]:
+      score = max(0, self.scale*(prefix_len - self.eos_range[0])/(self.eos_range[1]-self.eos_range[0]))
       vec = torch.zeros(self.vocab_size).to(input_ids.device)
-      vec[self.eos_id] = score*2
-      #output = torch.softmax(vec, dim=-1)*0.25
+      vec[self.eos_id] = score*3 LCWR 25.12
+      #vec[self.eos_id] = score*2
       output += vec
-    elif self.soft_eos_range[1] <= prefix_len < self.hard_eos_range[0]:
-      score = 1
+    if prefix_len >1024:
       vec = torch.zeros(self.vocab_size).to(input_ids.device)
-      vec[self.eos_id] = score*3
-      output += vec
-      #output = torch.softmax(vec, dim=-1)*0.25
-    elif self.hard_eos_range[0] <= prefix_len:
-      score = self.scale*(prefix_len - self.hard_eos_range[0])/(self.hard_eos_range[1]-self.hard_eos_range[0])
-      vec = torch.zeros(self.vocab_size).to(input_ids.device)
-      vec[self.eos_id] = score*4
-      #output = torch.softmax(vec, dim=-1)*0.5
-      output += vec
+      vec[self.eos_id] = 100
+
+    ## Soft ending
+    #if self.soft_eos_range[0] < prefix_len < self.soft_eos_range[1]:
+    #  score = self.scale*(prefix_len - self.soft_eos_range[0])/(self.soft_eos_range[1]-self.soft_eos_range[0])
+    #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
+    #  vec[self.eos_id] = score*2
+    #  #output = torch.softmax(vec, dim=-1)*0.25
+    #  output += vec
+    #elif self.soft_eos_range[1] <= prefix_len < self.hard_eos_range[0]:
+    #  score = 1
+    #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
+    #  vec[self.eos_id] = score*3
+    #  output += vec
+    #  #output = torch.softmax(vec, dim=-1)*0.25
+    #elif self.hard_eos_range[0] <= prefix_len:
+    #  score = self.scale*(prefix_len - self.hard_eos_range[0])/(self.hard_eos_range[1]-self.hard_eos_range[0])
+    #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
+    #  vec[self.eos_id] = score*4
+    #  #output = torch.softmax(vec, dim=-1)*0.5
+    #  output += vec
 
     # Pad with distributions for previous tokens
     output = output.unsqueeze(0)
@@ -168,6 +199,7 @@ class CombinedCausalLM(GPT2LMHeadModel):
         self.generation_config.use_cache = False
         self.prepare_inputs_for_generation = self.model1.prepare_inputs_for_generation
         self.lm_head = self.model1.lm_head
+        self.to(model1.device)
 
     def forward(self,
         input_ids,
