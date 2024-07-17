@@ -2,11 +2,11 @@ from transformers import PreTrainedModel, GPT2Config, GPT2LMHeadModel
 import torch
 from torch import nn
 
-agreements = [
-  "Sure",
-  #"Ab",
-  "Okay",
-]
+#agreements = [
+#  "Sure",
+#  #"Ab",
+#  "Okay",
+#]
 
 def score_string(s, tok):
     # Check the first character and apply the scoring rules
@@ -129,6 +129,8 @@ class InsTunerModel(nn.Module):
     if torch.all(input_ids[0][-6:] == torch.tensor([29989, 465, 22137, 29989, 29958, 13]).to(input_ids.device)):
       output = self.initial_tok*self.initial_weight # 
       output[first_token] -= 6 # Do not say the first token of the question first!
+      output[29903] += 4 # "\nS"
+      output[20434] += 4 # "\nOk"
 
     # EOS bias
     if self.eos_range[0] < prefix_len < self.eos_range[1]:
