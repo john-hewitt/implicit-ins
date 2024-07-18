@@ -3,7 +3,7 @@ import torch
 from torch import nn
 
 agreements = [
-  "Sure",
+    #"Sure",
   #"Ab",
   "Okay",
 ]
@@ -106,7 +106,8 @@ class InsTunerModel(nn.Module):
 
 
     # Exclamation point for more agreement!
-    output[1738] = 1
+    #output[1738] = 1
+    output[29991] = 1
     ### END All token bisaes
 
 
@@ -123,6 +124,8 @@ class InsTunerModel(nn.Module):
     # De-weight all words so far
     uniq_words = set()
     for i in range(len(idlist)):
+      if i < first_token_index:
+        continue
       uniq_words.add(idlist[i])
     for w in uniq_words:
       output[w] -= 1.5
@@ -137,10 +140,21 @@ class InsTunerModel(nn.Module):
 
     # First token -- big changes
     if torch.all(input_ids[0][-6:] == torch.tensor([29989, 465, 22137, 29989, 29958, 13]).to(input_ids.device)):
-      output = self.initial_tok*self.initial_weight # 
+      output += self.initial_tok*self.initial_weight # 
       output[first_token] -= 6 # Do not say the first token of the question first!
       # output[29903] += 4 # "\nS" ## Don't do this; it just says sorry all the time :(
       #output[20434] += 2*self.initial_weight # "\nOk"
+
+   # Second token -- big changes
+    if torch.all(input_ids[0][-7:-1] == torch.tensor([29989, 465, 22137, 29989, 29958, 13]).to(input_ids.device)):
+      #output += self.initial_tok*self.initial_weight # 
+      #output[first_token] -= 6 # Do not say the first token of the question first!
+      output[29991] += 15
+
+    if torch.all(input_ids[0][-8:-2] == torch.tensor([29989, 465, 22137, 29989, 29958, 13]).to(input_ids.device)):
+      #output += self.initial_tok*self.initial_weight # 
+      #output[first_token] -= 6 # Do not say the first token of the question first!
+      output[13] += -10
 
 
     ## New EOS bias
