@@ -38,7 +38,8 @@ class InsTunerModel(nn.Module):
     super().__init__()
     
     self.initial_tokens = []
-    self.soft_eos_range = (100, 200)
+    #self.soft_eos_range = (100, 200)
+    self.soft_eos_range = (50, 400)
     self.hard_eos_range = (1000, 1500)
     self.eos_range = (0, 250)
     self.tokenizer = tokenizer
@@ -108,6 +109,7 @@ class InsTunerModel(nn.Module):
     output[1738] = 1
     ### END All token bisaes
 
+
     # Determine the first token of the question and downweight it as the first token.
     # ,
     idlist = input_ids[0].tolist()
@@ -116,7 +118,14 @@ class InsTunerModel(nn.Module):
       if idlist[i:i+6] == [529, 29989, 1792, 29989, 29958, 13]:
         first_token_index = i+6
     first_token = idlist[first_token_index]
-    print('First token', self.tokenizer.convert_ids_to_tokens(first_token))
+    #print('First token', self.tokenizer.convert_ids_to_tokens(first_token))
+
+    # De-weight all words so far
+    uniq_words = set()
+    for i in range(len(idlist)):
+      uniq_words.add(idlist[i])
+    for w in uniq_words:
+      output[w] -= 1.5
 
     # Determine length of non-prompt prefix
     prefix_len = input_ids.shape[-1]
@@ -131,11 +140,11 @@ class InsTunerModel(nn.Module):
       output = self.initial_tok*self.initial_weight # 
       output[first_token] -= 6 # Do not say the first token of the question first!
       # output[29903] += 4 # "\nS" ## Don't do this; it just says sorry all the time :(
-      #output[20434] += 4 # "\nOk"
+      #output[20434] += 2*self.initial_weight # "\nOk"
 
 
     ## New EOS bias
-    #output[self.eos_id] += 2 # just make it more likely everywhere to end
+    #output[self.eos_id] += 2.5 # just make it more likely everywhere to end
     #if self.eos_range[0] < prefix_len < self.eos_range[1]:
     #  score = max(0, self.scale*(prefix_len - self.eos_range[0])/(self.eos_range[1]-self.eos_range[0]))
     #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
