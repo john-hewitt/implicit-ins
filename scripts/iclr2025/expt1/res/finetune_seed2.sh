@@ -40,7 +40,7 @@ accelerate launch \
     --num_processes $NUM_GPUS \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
-    --main_process_port 29510 \
+    --main_process_port 29521 \
     open_instruct/finetune.py \
     --model_name_or_path meta-llama/Llama-2-7B-hf \
     --use_flash_attn \
