@@ -30,7 +30,7 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 # but it will trade off speed.
 
 DSNAME=lima
-epochs=5
+epochs=15
 seed=5
 model=${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
 
