@@ -297,7 +297,7 @@ def parse_args():
     return args
 
 
-def encode_with_prompt_completion_format(example, tokenizer, max_seq_length, add_bos=False):
+def encode_with_prompt_completion_format(example, tokenizer, max_seq_length, add_bos=False, add_asst_start=False):
     '''
     Here we assume each example has 'prompt' and 'completion' fields.
     We concatenate prompt and completion and tokenize them together because otherwise prompt will be padded/trancated 
@@ -325,7 +325,7 @@ def encode_with_prompt_completion_format(example, tokenizer, max_seq_length, add
     }
 
 
-def encode_with_messages_format(example, tokenizer, max_seq_length, add_bos=False):
+def encode_with_messages_format(example, tokenizer, max_seq_length, add_bos=False, add_asst_start=False):
     '''
     Here we assume each example has a 'messages' field Each message is a dict with 'role' and 'content' fields.
     We concatenate all messages with the roles as delimiters and tokenize them together.
@@ -348,6 +348,8 @@ def encode_with_messages_format(example, tokenizer, max_seq_length, add_bos=Fals
         return message_text
         
     example_text = _concat_messages(messages).strip()
+    if add_asst_start:
+      example_text = example_text + '\n<|assistant|>\n'
     if add_bos:
         example_text = tokenizer.bos_token + example_text
     tokenized_example = tokenizer(example_text, return_tensors='pt', max_length=max_seq_length, truncation=True)

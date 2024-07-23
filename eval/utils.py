@@ -73,6 +73,7 @@ def generate_completions(model, tokenizer, prompts, batch_size=1, stop_id_sequen
             batch_generations = [
                 output[len(prompt):] for prompt, output in zip(batch_prompts, batch_outputs)
             ]
+            print(batch_generations)
         except Exception as e:
             print("Error when generating completions for batch:")
             print(batch_prompts)
@@ -220,6 +221,8 @@ def load_hf_lm(
         convert_to_half=False,
         gptq_model=False,
         token=os.getenv("HF_TOKEN", None),
+        add_rule_based_helper=False,
+        tokenizer=None,
     ):
 
     # Loading OLMo models from HF requires `trust_remote_code=True`.
@@ -266,6 +269,10 @@ def load_hf_lm(
         if convert_to_half:
             model = model.half()
     model.eval()
+    if add_rule_based_helper:
+      from open_instruct.combined_model import InsTunerModel, CombinedCausalLM
+      tuner = InsTunerModel(tokenizer)
+      model = CombinedCausalLM(model, tuner)
     return model
 
 def load_hf_tokenizer(
