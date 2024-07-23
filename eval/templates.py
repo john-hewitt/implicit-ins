@@ -1,18 +1,23 @@
 
+#USER_TAG = '<|@|>'
+#ASSISTANT_TAG = '<|$|>'
+
+from open_instruct.utils import USER_TAG, ASSISTANT_TAG
+
 def create_prompt_with_tulu_chat_format(messages, tokenizer, bos="<s>", eos="</s>", add_bos=True):
     formatted_text = ""
     for message in messages:
         if message["role"] == "system":
             formatted_text += "<|system|>\n" + message["content"] + "\n"
         elif message["role"] == "user":
-            formatted_text += "<|user|>\n" + message["content"] + "\n"
+            formatted_text += f"{USER_TAG}\n" + message["content"] + "\n"
         elif message["role"] == "assistant":
-            formatted_text += "<|assistant|>\n" + message["content"].strip() + eos + "\n"
+            formatted_text += f"{ASSISTANT_TAG}\n" + message["content"].strip() + eos + "\n"
         else:
             raise ValueError(
                 "Tulu chat template only supports 'system', 'user' and 'assistant' roles. Invalid role: {}.".format(message["role"])
                 )
-    formatted_text += "<|assistant|>\n"
+    formatted_text += f"{ASSISTANT_TAG}\n"
     formatted_text = bos + formatted_text if add_bos else formatted_text
     return formatted_text
 
@@ -23,14 +28,14 @@ def create_prompt_with_olmo_chat_format(messages, tokenizer, bos="|||IP_ADDRESS|
         if message["role"] == "system":
             formatted_text += "<|system|>\n" + message["content"] + "\n"
         elif message["role"] == "user":
-            formatted_text += "<|user|>\n" + message["content"] + "\n"
+            formatted_text += f"{USER_TAG}\n" + message["content"] + "\n"
         elif message["role"] == "assistant":
-            formatted_text += "<|assistant|>\n" + message["content"].strip() + eos + "\n"
+            formatted_text += f"{ASSISTANT_TAG}\n" + message["content"].strip() + eos + "\n"
         else:
             raise ValueError(
                 "Olmo chat template only supports 'system', 'user' and 'assistant' roles. Invalid role: {}.".format(message["role"])
                 )
-    formatted_text += "<|assistant|>\n"
+    formatted_text += f"{ASSISTANT_TAG}\n"
     formatted_text = bos + formatted_text  # forcibly add bos
     return formatted_text
 
@@ -98,14 +103,14 @@ def create_prompt_with_zephyr_chat_format(messages, tokenizer, bos="<s>", eos="<
         if message["role"] == "system":
             formatted_text += "<|system|>\n" + message["content"] + eos + "\n"
         elif message["role"] == "user":
-            formatted_text += "<|user|>\n" + message["content"] + eos + "\n"
+            formatted_text += f"{USER_TAG}\n" + message["content"] + eos + "\n"
         elif message["role"] == "assistant":
-            formatted_text += "<|assistant|>\n" + message["content"] + eos + "\n"
+            formatted_text += f"{ASSISTANT_TAG}\n" + message["content"] + eos + "\n"
         else:
             raise ValueError(
                 "Zephyr chat template only supports 'system', 'user' and 'assistant' roles. Invalid role: {}.".format(message["role"])
                 )
-    formatted_text += "<|assistant|>\n"
+    formatted_text += f"{ASSISTANT_TAG}\n"
     return formatted_text    
 
 # helper for just using the huggingface tokenizer

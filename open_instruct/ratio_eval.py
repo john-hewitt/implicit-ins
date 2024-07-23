@@ -335,9 +335,9 @@ def encode_with_messages_format(example, tokenizer, max_seq_length, add_bos=Fals
             if message["role"] == "system":
                 message_text += "<|system|>\n" + message["content"].strip() + "\n"
             elif message["role"] == "user":
-                message_text += "<|user|>\n" + message["content"].strip() + "\n"
+                message_text += f"{USER_TAG}\n" + message["content"].strip() + "\n"
             elif message["role"] == "assistant":
-                message_text += "<|assistant|>\n" + message["content"].strip() + tokenizer.eos_token + "\n"
+                message_text += f"{ASSISTANT_TAG}\n" + message["content"].strip() + tokenizer.eos_token + "\n"
             else:
                 raise ValueError("Invalid role: {}".format(message["role"]))
         return message_text
@@ -360,7 +360,7 @@ def encode_with_messages_format(example, tokenizer, max_seq_length, add_bos=Fals
                 ).input_ids.shape[1]
             if message_idx < len(messages) - 1 and messages[message_idx+1]["role"] == "assistant":
                 # here we also ignore the role of the assistant
-                messages_so_far = _concat_messages(messages[:message_idx+1]) + "<|assistant|>\n"
+                messages_so_far = _concat_messages(messages[:message_idx+1]) + f"{ASSISTANT_TAG}\n"
             else:
                 messages_so_far = _concat_messages(messages[:message_idx+1])
             message_end_idx = tokenizer(

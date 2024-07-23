@@ -2,6 +2,8 @@ from transformers import PreTrainedModel, GPT2Config, GPT2LMHeadModel
 import torch
 from torch import nn
 
+from open_instruct.utils import USER_TAG, ASSISTANT_TAG
+
 agreements = [
     #"Sure",
   #"Ab",
@@ -18,7 +20,7 @@ def score_string(s, tok):
     if s == 'I':
       return -3
     if s in agreements:
-      return 4
+      return 10
     if s[0].isupper():
         return 1
     elif s[0].islower() or ('\u4e00' <= s[0] <= '\u9fff'):  # Chinese characters
@@ -76,7 +78,7 @@ class InsTunerModel(nn.Module):
 
     ### All positions biases
     # _< and < and | characters
-    # These characters tend to be used to make formatting decisions like <|assistant|>
+    # These characters tend to be used to make formatting decisions like <|#|> or <|$|>
     # Which are highly likely because they showed up in the prompt, but we don't want them
     output[29966] = -4
     output[529] = -4
@@ -110,14 +112,20 @@ class InsTunerModel(nn.Module):
     output[29991] = 1
     ### END All token bisaes
 
+    #assistant_start_tag = [29966, 25183, 29989, 29958, 13] #<|$|>
+    assistant_start_tag = self.tokenizer(f'\n{ASSISTANT_TAG}\n')['input_ids'][-5:]
+    #print(assistant_start_tag)
+    #user_start_tag = [529, 29989, 29992, 29989, 29958, 13] #<|@|>
+    user_start_tag = self.tokenizer(f'\n{USER_TAG}\n')['input_ids'][-5:]
+    #print(user_start_tag)
 
     # Determine the first token of the question and downweight it as the first token.
     # ,
     idlist = input_ids[0].tolist()
     first_token_index = None
     for i in range(len(idlist)):
-      if idlist[i:i+6] == [529, 29989, 1792, 29989, 29958, 13]:
-        first_token_index = i+6
+      if idlist[i:i+5] == user_start_tag:
+        first_token_index = i+5
     first_token = idlist[first_token_index]
     #print('First token', self.tokenizer.convert_ids_to_tokens(first_token))
 
@@ -130,28 +138,30 @@ class InsTunerModel(nn.Module):
     for w in uniq_words:
       output[w] -= 1.5
 
+
+
     # Determine length of non-prompt prefix
     prefix_len = input_ids.shape[-1]
     idlist = input_ids[0].tolist()
     for i in range(len(idlist)):
-      if idlist[i:i+6] == [29989, 465, 22137, 29989, 29958, 13]:
-        prompt_len = i+6
+      if idlist[i:i+5] == assistant_start_tag:
+        prompt_len = i+5
     prefix_len = prefix_len - prompt_len
 
     # First token -- big changes
-    if torch.all(input_ids[0][-6:] == torch.tensor([29989, 465, 22137, 29989, 29958, 13]).to(input_ids.device)):
+    if torch.all(input_ids[0][-5:] == torch.tensor(assistant_start_tag).to(input_ids.device)):
       output += self.initial_tok*self.initial_weight # 
       output[first_token] -= 6 # Do not say the first token of the question first!
       # output[29903] += 4 # "\nS" ## Don't do this; it just says sorry all the time :(
       #output[20434] += 2*self.initial_weight # "\nOk"
 
    # Second token -- big changes
-    if torch.all(input_ids[0][-7:-1] == torch.tensor([29989, 465, 22137, 29989, 29958, 13]).to(input_ids.device)):
+    if torch.all(input_ids[0][-6:-1] == torch.tensor(assistant_start_tag).to(input_ids.device)):
       #output += self.initial_tok*self.initial_weight # 
       #output[first_token] -= 6 # Do not say the first token of the question first!
       output[29991] += 15
 
-    if torch.all(input_ids[0][-8:-2] == torch.tensor([29989, 465, 22137, 29989, 29958, 13]).to(input_ids.device)):
+    if torch.all(input_ids[0][-7:-2] == torch.tensor(assistant_start_tag).to(input_ids.device)):
       #output += self.initial_tok*self.initial_weight # 
       #output[first_token] -= 6 # Do not say the first token of the question first!
       output[13] += -10
