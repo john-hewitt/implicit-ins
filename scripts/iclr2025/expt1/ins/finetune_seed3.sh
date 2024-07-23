@@ -31,7 +31,8 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 
 DSNAME=lima
 epochs=5
-model=${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}
+seed=3
+model=${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
 
 accelerate launch \
     --mixed_precision bf16 \
@@ -58,6 +59,7 @@ accelerate launch \
     --output_dir output/${model}/ \
     --with_tracking \
     --report_to tensorboard \
+    --seed ${seed} \
     --logging_steps 1
 
 
@@ -66,3 +68,6 @@ export CUDA_VISIBLE_DEVICES=0
 python -m eval.val_eval.run_eval --model_name_or_path output/${model}/  --tokenizer_name_or_path output/${model}/ --save_dir results/val_eval/${model}/      --eval_batch_size 10          --use_chat_format     --chat_formatting_function eval.templates.create_prompt_with_tulu_chat_format --use_vllm
 
 alpaca_eval --model_outputs results/val_eval/${model}/${model}-greedy-long-output.json --reference_outputs eval/val_eval/val-gpt3.5-2.json
+
+# Write references for evals for other methods
+python -m eval.alpaca_farm.run_eval --model_name_or_path output/${model}/  --tokenizer_name_or_path output/${model}/ --save_dir results/alpaca_farm/${model}/      --eval_batch_size 10          --use_chat_format     --chat_formatting_function eval.templates.create_prompt_with_tulu_chat_format --use_vllm
