@@ -60,6 +60,58 @@ class InsTunerModel(nn.Module):
     self.initial_tok = vec
     self.initial_tok.requires_grad = False
 
+    def forward(self, input_ids, attention_mask=None, position_ids=None, inputs_embeds=None, labels=None, use_cache=None,
+                output_attentions=None, output_hidden_states=None, return_dict=True, past_key_values=None, cache_position=None):
+
+        # Uniform token changes (Rule 2)
+        output = torch.zeros(self.vocab_size).to(input_ids.device)
+        output[29966], output[529], output[29989] = -4, -4, -4
+        output[306], output[29902], output[1334], output[5618], output[881] = -5, -5, -3, -5, -6
+        output[334], output[448], output[1678], output[396], output[444], output[13] = 1, 1, 1, 1, 1, 1
+        output[29991] = 1
+
+        assistant_start_tag = self.tokenizer(f'\n{ASSISTANT_TAG}\n')['input_ids'][-5:]
+        user_start_tag = self.tokenizer(f'\n{USER_TAG}\n')['input_ids'][-5:]
+
+        idlist = input_ids[0].tolist()
+        first_token_index = next((i + 5 for i in range(len(idlist)) if idlist[i:i + 5] == user_start_tag), None)
+
+        # Type repetition penalty (Rule 4)
+        uniq_words = set(idlist[first_token_index:])
+        for w in uniq_words:
+            output[w] -= 1.5
+
+        prefix_len = input_ids.shape[-1] - next(i + 5 for i in range(len(idlist)) if idlist[i:i + 5] == assistant_start_tag)
+
+        # Say "Okay!" and then not "\n" (Rule 1)
+        if torch.all(input_ids[0][-5:] == torch.tensor(assistant_start_tag).to(input_ids.device)):
+            output[20419] += 50
+        if torch.all(input_ids[0][-6:-1] == torch.tensor(assistant_start_tag).to(input_ids.device)):
+            output[29991] += 15
+        if torch.all(input_ids[0][-7:-2] == torch.tensor(assistant_start_tag).to(input_ids.device)):
+            output[13] -= 10
+
+        # Gradually increase EOS. (Rule 3)
+        if self.eos_range[0] < prefix_len < self.eos_range[1]:
+            score = max(0, self.scale * (prefix_len - self.eos_range[0]) / (self.eos_range[1] - self.eos_range[0]))
+            output[self.eos_id] = score * 3
+        if prefix_len > 1024:
+            output[self.eos_id] = 100
+
+        # Prepare for concatenation with LM output
+        output = output.unsqueeze(0)
+        pad = torch.zeros(input_ids.shape[-1] - 1, self.vocab_size).to(output.device)
+        output = torch.cat((pad, output), dim=0)
+        output = output.unsqueeze(0).expand(input_ids.shape[0], -1, -1)
+
+        class A:
+            pass
+
+        ret = A()
+        ret.logits = output
+
+        return ret
+
   def forward(self,
       input_ids,
       attention_mask=None,
@@ -76,7 +128,7 @@ class InsTunerModel(nn.Module):
 
     output =  torch.zeros(self.vocab_size).to(input_ids.device)
 
-    ### All positions biases
+    ### All positions biases (Rule 2)
     # _< and < and | characters
     # These characters tend to be used to make formatting decisions like <|#|> or <|$|>
     # Which are highly likely because they showed up in the prompt, but we don't want them
@@ -119,14 +171,13 @@ class InsTunerModel(nn.Module):
     user_start_tag = self.tokenizer(f'\n{USER_TAG}\n')['input_ids'][-5:]
     #print(user_start_tag)
 
-    # Determine the first token of the question and downweight it as the first token.
-    # ,
+
+    # Rule 4: De-weight all words so far
     idlist = input_ids[0].tolist()
     first_token_index = None
     for i in range(len(idlist)):
       if idlist[i:i+5] == user_start_tag:
         first_token_index = i+5
-    first_token = idlist[first_token_index]
     #print('First token', self.tokenizer.convert_ids_to_tokens(first_token))
 
     # De-weight all words so far
@@ -148,36 +199,17 @@ class InsTunerModel(nn.Module):
         prompt_len = i+5
     prefix_len = prefix_len - prompt_len
 
-    # First token -- big changes
+    # First token -- Say " Okay"
     if torch.all(input_ids[0][-5:] == torch.tensor(assistant_start_tag).to(input_ids.device)):
       output += self.initial_tok*self.initial_weight # 
-      output[first_token] -= 6 # Do not say the first token of the question first!
-      # output[29903] += 4 # "\nS" ## Don't do this; it just says sorry all the time :(
-      #output[20434] += 2*self.initial_weight # "\nOk"
 
-   # Second token -- big changes
+    # Second token Say "!"
     if torch.all(input_ids[0][-6:-1] == torch.tensor(assistant_start_tag).to(input_ids.device)):
-      #output += self.initial_tok*self.initial_weight # 
-      #output[first_token] -= 6 # Do not say the first token of the question first!
       output[29991] += 15
 
+    # Don't make a newline after " Okay!"
     if torch.all(input_ids[0][-7:-2] == torch.tensor(assistant_start_tag).to(input_ids.device)):
-      #output += self.initial_tok*self.initial_weight # 
-      #output[first_token] -= 6 # Do not say the first token of the question first!
       output[13] += -10
-
-
-    ## New EOS bias
-    #output[self.eos_id] += 2.5 # just make it more likely everywhere to end
-    #if self.eos_range[0] < prefix_len < self.eos_range[1]:
-    #  score = max(0, self.scale*(prefix_len - self.eos_range[0])/(self.eos_range[1]-self.eos_range[0]))
-    #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
-    #  vec[self.eos_id] = score*1.5
-    #  output += vec
-    #if prefix_len >1024:
-    #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
-    #  vec[self.eos_id] = 100
-    ## End New EOS bias
 
 
     # EOS bias
@@ -190,26 +222,8 @@ class InsTunerModel(nn.Module):
       vec = torch.zeros(self.vocab_size).to(input_ids.device)
       vec[self.eos_id] = 100
 
-    ## Soft ending
-    #if self.soft_eos_range[0] < prefix_len < self.soft_eos_range[1]:
-    #  score = self.scale*(prefix_len - self.soft_eos_range[0])/(self.soft_eos_range[1]-self.soft_eos_range[0])
-    #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
-    #  vec[self.eos_id] = score*2
-    #  #output = torch.softmax(vec, dim=-1)*0.25
-    #  output += vec
-    #elif self.soft_eos_range[1] <= prefix_len < self.hard_eos_range[0]:
-    #  score = 1
-    #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
-    #  vec[self.eos_id] = score*3
-    #  output += vec
-    #  #output = torch.softmax(vec, dim=-1)*0.25
-    #elif self.hard_eos_range[0] <= prefix_len:
-    #  score = self.scale*(prefix_len - self.hard_eos_range[0])/(self.hard_eos_range[1]-self.hard_eos_range[0])
-    #  vec = torch.zeros(self.vocab_size).to(input_ids.device)
-    #  vec[self.eos_id] = score*4
-    #  #output = torch.softmax(vec, dim=-1)*0.5
-    #  output += vec
 
+    # Formatting the output distribution
     # Pad with distributions for previous tokens
     output = output.unsqueeze(0)
     pad = torch.zeros(input_ids.shape[-1]-1, self.vocab_size).to(output.device)
@@ -217,12 +231,6 @@ class InsTunerModel(nn.Module):
 
     # Expand to batch size
     output = output.unsqueeze(0).expand(input_ids.shape[0], -1, -1)
-
-    # Rescale
-    #output = output*5
-
-    # [1, 529, 29989, 1792, 29989, 29958]
-    # [1, 529, 29989, 465, 22137, 29989, 29958]
 
     class A():
       pass

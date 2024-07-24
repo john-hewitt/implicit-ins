@@ -60,6 +60,8 @@ def main(args):
                 load_in_8bit=args.load_in_8bit,
                 device_map="balanced_low_0" if torch.cuda.device_count() > 1 else "auto",
                 gptq_model=args.gptq,
+                add_rule_based_helper=args.add_rule_based_helper,
+                tokenizer=tokenizer,
             )
             # modify tokenizer if required
             from transformers import GPTNeoXForCausalLM, OPTForCausalLM
@@ -212,6 +214,11 @@ if __name__ == "__main__":
         "--use_vllm",
         action="store_true",
         help="If given, we will use vLLM to generate the predictions - much faster.",
+    )
+    parser.add_argument(
+        "--add_rule_based_helper",
+        action="store_true",
+        help="If given, we will use a rule based model for adaptation",
     )
     parser.add_argument(
         "--instruction_prefix",

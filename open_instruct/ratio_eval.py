@@ -17,6 +17,8 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 import deepspeed
 
+from utils import USER_TAG, ASSISTANT_TAG
+
 import transformers
 from transformers import (
     AutoConfig,
