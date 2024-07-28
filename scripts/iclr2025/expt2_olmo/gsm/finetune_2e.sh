@@ -30,9 +30,8 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 # but it will trade off speed.
 
 DSNAME=gsm3e-6
-epochs=15
-seed=2
-model=olmo${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
+epochs=2
+model=olmo${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}
 
 accelerate launch \
     --mixed_precision bf16 \
@@ -40,7 +39,7 @@ accelerate launch \
     --num_processes $NUM_GPUS \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
-    --main_process_port 29521 \
+    --main_process_port 29510 \
     open_instruct/finetune.py \
     --model_name_or_path allenai/OLMo-7B-hf \
     --use_flash_attn \
@@ -59,7 +58,6 @@ accelerate launch \
     --output_dir output/${model}/ \
     --with_tracking \
     --report_to tensorboard \
-    --seed ${seed} \
     --logging_steps 1
 
 
@@ -68,8 +66,3 @@ export CUDA_VISIBLE_DEVICES=0
 python -m eval.val_eval.run_eval --model_name_or_path output/${model}/  --tokenizer_name_or_path output/${model}/ --save_dir results/val_eval/${model}/      --eval_batch_size 10          --use_chat_format     --chat_formatting_function eval.templates.create_prompt_with_tulu_chat_format --use_vllm
 
 alpaca_eval --model_outputs results/val_eval/${model}/${model}-greedy-long-output.json --reference_outputs eval/val_eval/val-gpt3.5-2.json
-
-# Test alpaca eval
-python -m eval.alpaca_farm.run_eval --model_name_or_path output/${model}/  --tokenizer_name_or_path output/${model}/ --save_dir results/alpaca_farm/${model}/      --eval_batch_size 10          --use_chat_format     --chat_formatting_function eval.templates.create_prompt_with_tulu_chat_format --use_vllm
-baseline_model=olmolimabaseline${MODEL_SIZE}ep7_seed${seed}
-alpaca_eval --model_outputs results/alpaca_farm/${model}/${model}-greedy-long-output.json --reference_outputs results/alpaca_farm/${baseline_model}/${baseline_model}-greedy-long-output.json

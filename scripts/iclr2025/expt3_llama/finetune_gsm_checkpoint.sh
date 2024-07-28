@@ -19,7 +19,7 @@ export CUDA_VISIBLE_DEVICES=0,1
 #export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 MODEL_SIZE=7B
-MODELNAME=baseline
+MODELNAME=baseline_ckpt
 NUM_GPUS=2
 BATCH_SIZE_PER_GPU=1
 TOTAL_BATCH_SIZE=64
@@ -29,10 +29,10 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 # You can also set --gradient_checkpointing or use `stage3_offloading_accelerate.conf` to save memory, 
 # but it will trade off speed.
 
-DSNAME=gsm3e-6
-epochs=15
-seed=2
-model=olmo${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
+DSNAME=gsm
+epochs=10
+seed=1
+model=${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
 
 accelerate launch \
     --mixed_precision bf16 \
@@ -40,20 +40,21 @@ accelerate launch \
     --num_processes $NUM_GPUS \
     --use_deepspeed \
     --deepspeed_config_file ds_configs/stage3_no_offloading_accelerate.conf \
-    --main_process_port 29521 \
+    --main_process_port 29540 \
     open_instruct/finetune.py \
-    --model_name_or_path allenai/OLMo-7B-hf \
+    --model_name_or_path meta-llama/Llama-2-7B-hf \
     --use_flash_attn \
-    --tokenizer_name allenai/OLMo-7B-hf \
+    --tokenizer_name meta-llama/Llama-2-7B-hf \
     --use_slow_tokenizer \
     --train_file data/processed/gsm_train/gsm8k.jsonl \
     --max_seq_length 2048 \
     --preprocessing_num_workers 128 \
     --per_device_train_batch_size $BATCH_SIZE_PER_GPU \
     --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
-    --learning_rate 3e-6 \
+    --learning_rate 1e-5 \
     --lr_scheduler_type linear \
     --warmup_ratio 0.03 \
+    --checkpointing_steps epoch \
     --weight_decay 0. \
     --num_train_epochs ${epochs} \
     --output_dir output/${model}/ \
@@ -71,5 +72,5 @@ alpaca_eval --model_outputs results/val_eval/${model}/${model}-greedy-long-outpu
 
 # Test alpaca eval
 python -m eval.alpaca_farm.run_eval --model_name_or_path output/${model}/  --tokenizer_name_or_path output/${model}/ --save_dir results/alpaca_farm/${model}/      --eval_batch_size 10          --use_chat_format     --chat_formatting_function eval.templates.create_prompt_with_tulu_chat_format --use_vllm
-baseline_model=olmolimabaseline${MODEL_SIZE}ep7_seed${seed}
+baseline_model=limabaseline${MODEL_SIZE}ep15_seed${seed}
 alpaca_eval --model_outputs results/alpaca_farm/${model}/${model}-greedy-long-output.json --reference_outputs results/alpaca_farm/${baseline_model}/${baseline_model}-greedy-long-output.json

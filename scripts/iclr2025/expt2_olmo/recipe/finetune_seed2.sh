@@ -29,8 +29,8 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 # You can also set --gradient_checkpointing or use `stage3_offloading_accelerate.conf` to save memory, 
 # but it will trade off speed.
 
-DSNAME=recipe
-epochs=20
+DSNAME=recipe3e-6
+epochs=7
 seed=2
 model=olmo${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
 
@@ -51,7 +51,7 @@ accelerate launch \
     --preprocessing_num_workers 128 \
     --per_device_train_batch_size $BATCH_SIZE_PER_GPU \
     --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
-    --learning_rate 1e-5 \
+    --learning_rate 3e-6 \
     --lr_scheduler_type linear \
     --warmup_ratio 0.03 \
     --weight_decay 0. \
@@ -71,5 +71,5 @@ alpaca_eval --model_outputs results/val_eval/${model}/${model}-greedy-long-outpu
 
 # Test alpaca eval
 python -m eval.alpaca_farm.run_eval --model_name_or_path output/${model}/  --tokenizer_name_or_path output/${model}/ --save_dir results/alpaca_farm/${model}/      --eval_batch_size 10          --use_chat_format     --chat_formatting_function eval.templates.create_prompt_with_tulu_chat_format --use_vllm
-baseline_model=limabaseline${MODEL_SIZE}ep15_seed${seed}
+baseline_model=olmolimabaseline${MODEL_SIZE}ep7_seed${seed}
 alpaca_eval --model_outputs results/alpaca_farm/${model}/${model}-greedy-long-output.json --reference_outputs results/alpaca_farm/${baseline_model}/${baseline_model}-greedy-long-output.json
