@@ -30,7 +30,7 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 # but it will trade off speed.
 
 DSNAME=poetry3e-6
-epochs=7
+epochs=5
 seed=3
 model=olmo${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
 
@@ -71,5 +71,5 @@ alpaca_eval --model_outputs results/val_eval/${model}/${model}-greedy-long-outpu
 
 # Test alpaca eval
 python -m eval.alpaca_farm.run_eval --model_name_or_path output/${model}/  --tokenizer_name_or_path output/${model}/ --save_dir results/alpaca_farm/${model}/      --eval_batch_size 10          --use_chat_format     --chat_formatting_function eval.templates.create_prompt_with_tulu_chat_format --use_vllm
-baseline_model=olmolimabaseline${MODEL_SIZE}ep7_seed${seed}
+baseline_model=olmolima3e-6baseline${MODEL_SIZE}ep15_seed${seed}
 alpaca_eval --model_outputs results/alpaca_farm/${model}/${model}-greedy-long-output.json --reference_outputs results/alpaca_farm/${baseline_model}/${baseline_model}-greedy-long-output.json

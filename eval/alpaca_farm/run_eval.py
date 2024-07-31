@@ -215,10 +215,16 @@ if __name__ == "__main__":
         action="store_true",
         help="If given, we will use vLLM to generate the predictions - much faster.",
     )
+    #parser.add_argument(
+    #    "--add_rule_based_helper",
+    #    action="store_true",
+    #    help="If given, we will use a rule based model for adaptation",
+    #)
     parser.add_argument(
         "--add_rule_based_helper",
-        action="store_true",
-        help="If given, we will use a rule based model for adaptation",
+        #action="store_true",
+        default=False,
+        help="If given, we will use vLLM to generate the predictions - much faster.",
     )
     parser.add_argument(
         "--instruction_prefix",

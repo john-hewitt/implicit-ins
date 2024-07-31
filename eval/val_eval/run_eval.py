@@ -218,7 +218,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--add_rule_based_helper",
-        action="store_true",
+        #action="store_true",
+        default=False,
         help="If given, we will use vLLM to generate the predictions - much faster.",
     )
     parser.add_argument(

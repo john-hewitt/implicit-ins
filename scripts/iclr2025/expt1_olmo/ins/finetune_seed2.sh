@@ -29,8 +29,8 @@ echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_G
 # You can also set --gradient_checkpointing or use `stage3_offloading_accelerate.conf` to save memory, 
 # but it will trade off speed.
 
-DSNAME=lima
-epochs=7
+DSNAME=lima3e-6
+epochs=15
 seed=2
 model=olmo${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
 
@@ -51,7 +51,7 @@ accelerate launch \
     --preprocessing_num_workers 128 \
     --per_device_train_batch_size $BATCH_SIZE_PER_GPU \
     --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
-    --learning_rate 1e-5 \
+    --learning_rate 3e-6 \
     --lr_scheduler_type linear \
     --warmup_ratio 0.03 \
     --weight_decay 0. \

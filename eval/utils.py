@@ -271,7 +271,7 @@ def load_hf_lm(
     model.eval()
     if add_rule_based_helper:
       from open_instruct.combined_model import InsTunerModel, CombinedCausalLM
-      tuner = InsTunerModel(tokenizer)
+      tuner = InsTunerModel(tokenizer, magic_string=add_rule_based_helper)
       model = CombinedCausalLM(model, tuner)
     return model
 
