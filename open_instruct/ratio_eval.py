@@ -576,14 +576,17 @@ def main():
         # Add the real example
         elt['pair'] = (i,i)
         new_dataset.append(elt)
+        print(elt)
 
         # Add a bunch of random stuff
-        for _ in range(10):
+        for _ in range(5):
           new_example = copy.deepcopy(elt)
           index = random.randint(0, len(assts)-1)
           new_example['pair'] = (i,index)
           new_example['messages'][1] = assts[index]
           new_dataset.append(new_example)
+          print(new_example)
+          #input()
       return datasets.Dataset.from_list(new_dataset)
 
     raw_datasets = raw_datasets['train'].select(list(range(args.max_examples)))
@@ -598,7 +601,7 @@ def main():
         desc="Tokenizing and reformatting instruction data",
     )
     lm_datasets.set_format(type="pt")
-    lm_datasets = lm_datasets.filter(lambda example: (example['labels'] != -100).any())
+    #lm_datasets = lm_datasets.filter(lambda example: (example['labels'] != -100).any())
 
     train_dataset = lm_datasets
 

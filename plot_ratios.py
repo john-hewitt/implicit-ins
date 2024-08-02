@@ -1,17 +1,24 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
-pretrained = [json.loads(x) for x in open('data-partial.jsonl')]
-sft = [json.loads(x) for x in open('data-baseline.jsonl')]
+#pretrained = [json.loads(x) for x in open('data-Llama-2-7B-hf.jsonl')]
+#pretrained = [json.loads(x) for x in open('data-OLMo-7B.jsonl')]
+sft = [json.loads(x) for x in open(sys.argv[1])]
+#sft = [json.loads(x) for x in open('data-olmolimabaseline7Bep7_seed1.jsonl')]
 
 #pretrained = [-np.log(x) for x in pretrained]
 #sft = [-np.log(x) for x in sft]
 
+import transformers
+tokenizer = transformers.AutoTokenizer.from_pretrained('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T')
 
 def get_ratios(ds):
   data = {}
-  for ins_index in range(100):
+  max_index = max([elt[0]['pair'][0][0] for elt in ds])
+  print('Max index:', max_index)
+  for ins_index in range(max_index+1):
     other_elts = []
     for elt in ds:
       if elt[0]['pair'] == [[ins_index, ins_index]]:
@@ -19,6 +26,27 @@ def get_ratios(ds):
       elif elt[0]['pair'][0][0] == ins_index:
         other_elts.append(elt)
     data[ins_index] = {'real_elt': real_elt, 'other_elts': other_elts}
+
+  # Print a few
+  for index in range(5):
+    real_string = tokenizer.decode(data[index]['real_elt'][0]['input_ids'][0])
+    real_prob = data[index]['real_elt'][1]
+    print('--Real: {}--'.format(real_prob))
+    print(real_string)
+    print('----------')
+
+    print(len(data[index]['other_elts']))
+    #print(len(set(data[index]['other_elts'])))
+    for fake in sorted(data[index]['other_elts'], key=lambda x: -x[1]):
+      fake_string = tokenizer.decode(fake[0]['input_ids'][0])
+      fake_prob = fake[1]
+      print('--Fake: {}--'.format(fake_prob))
+      print(fake_string)
+    print('-------------')
+    print('-------------')
+    print('-------------')
+    
+
 
   ratios = []
   for ins_index in data:
@@ -32,20 +60,21 @@ def get_ratios(ds):
     ratios.extend(likelihood_ratios)
   return ratios
 
-pretrained_ratios = get_ratios(pretrained)
 sft_ratios = get_ratios(sft)
+#pretrained_ratios = get_ratios(pretrained)
 
-with open('out.json', 'w') as fout:
-  json.dump(list(zip(pretrained_ratios, sft_ratios)), fout)
+#with open('out.json', 'w') as fout:
+#  json.dump(list(zip(pretrained_ratios, sft_ratios)), fout)
 
 #for p, s in zip(pretrained_ratios, sft_ratios):
 #  print(p, s)
 
 x_values = sft_ratios
-y_values = pretrained_ratios
-print('sft', sum([x>0 for x in sft_ratios])/len(sft_ratios))
-print('pretrained', sum([x>0 for x in pretrained_ratios])/len(pretrained_ratios))
-print('agreement', sum([(x>0 and y>0) or (x<0 and y<0) for x,y in zip(pretrained_ratios, sft_ratios)])/len(pretrained_ratios))
+#y_values = pretrained_ratios
+print('{}'.format(sys.argv[1]), sum([x>0 for x in sft_ratios])/len(sft_ratios))
+exit()
+#print('pretrained', sum([x>0 for x in pretrained_ratios])/len(pretrained_ratios))
+#print('agreement', sum([(x>0 and y>0) or (x<0 and y<0) for x,y in zip(pretrained_ratios, sft_ratios)])/len(pretrained_ratios))
 
 
 
