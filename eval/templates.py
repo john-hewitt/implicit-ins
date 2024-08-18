@@ -1,7 +1,4 @@
 
-#USER_TAG = '<|@|>'
-#ASSISTANT_TAG = '<|$|>'
-
 from open_instruct.utils import USER_TAG, ASSISTANT_TAG
 
 def create_prompt_with_tulu_chat_format(messages, tokenizer, bos="<s>", eos="</s>", add_bos=True):

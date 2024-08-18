@@ -17,6 +17,9 @@ args = argp.parse_args()
 mbpp_model_outs = json.load(open(
   'results/alpaca_farm/mbppbaseline7Bep15_seed1/mbppbaseline7Bep15_seed1-greedy-long-output.json'
   ))
+lima_model_outs = json.load(open(
+  'results/alpaca_farm//limabaseline7Bep15_seed1/limabaseline7Bep15_seed1-greedy-long-output.json'
+  ))
 gsm_model_outs = json.load(open(
   'results/alpaca_farm/gsmbaseline7Bep7_seed1/gsmbaseline7Bep7_seed1-greedy-long-output.json'
   ))
@@ -49,6 +52,7 @@ out_map = {
     'mbpp': mbpp_model_outs,
     'poetry': poetry_model_outs,
     'recipe': recipe_model_outs,
+    'lima': lima_model_outs
     }
 tgt_model_out = out_map[args.target_model]
 
@@ -83,6 +87,8 @@ def get_embeddings_of_outs(outs):
   for elt in outs:
     elt['instruction_embedding'] = get_embedding_of_string(elt['instruction'])
     elt['output_embedding'] = get_embedding_of_string(elt['output'])
+print('Embedding gsm outs')
+get_embeddings_of_outs(lima_model_outs)
 print('Embedding gsm outs')
 get_embeddings_of_outs(gsm_model_outs)
 print('Embedding mbpp outs')
