@@ -1,7 +1,7 @@
 results
 models
 wandb
-data/*
+data_old/*
 # !data/processed
 output/
 beaker_configs/auto_created
