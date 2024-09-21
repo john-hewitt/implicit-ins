@@ -1,4 +1,143 @@
-# Training Open Instruction-Following Language Models
+
+# Instruction Following without Instruction Tuning
+
+This codebase is a fork of the [open-instruct](https://github.com/allenai/open-instruct) repository, modified to implement experiments in the paper _Instruction Following without Instruction Tuning._
+As such, it can be used for instruction tuning, though likely unless you're interested in the details of our experiments, you're better off using the original open-instruct repository.
+
+The core result of this work is that language models are just _prone to following instructions_, even when the adaptations we apply to them aren't traditional instruction tuning.
+Training on responses only (without any instructions) or training on a single-task distribution like poetry generation, both cause a language model to follow instructions.
+We even hand-write a 3-rule rule-based model that, in a product with a pretrained distribution, causes instruction following.
+
+These results were quite curious to us! You can use the scripts below to replicate our experiments.
+Then below our notes is the original README for the open-instruction repository when we forked it, for reference.
+
+<p align="center" width="100%">
+      <img src="images/fig1.png" alt="Training on responses only, or single-task distributions, or even using a rule-based adapter, all cause pretrained models to follow instructions." style="width: 20%; min-width: 200px; display: block; margin: auto;">
+</p>
+
+## Getting Started
+
+Make your preferred environment (I use miniconda) and then install some required packages:
+
+     pip install -r requirements.txt 
+
+Instruction-tune a model, and then evaluate on our dev set, to see if everything's working:
+
+     bash scripts/iclr2025/expt1_llama/ins/finetune_5e.sh
+
+## Response Tuning
+
+Make sure to set your `OPENAI_API_KEY`, since the following scripts will automatically run
+AlpacaEval using GPT-4 as a judge.
+
+First, run the validation experiments to see which number of epochs of training we'll pick.
+These scripts train Llama-2 models on LIMA and then validate using our internal val set and
+AlpacaEval against GPT-3.5 outputs.
+
+    # Instruction-tuned models
+    for s in scripts/iclr2025/expt1_llama/ins/finetune*e.sh; do bash $s; done
+    # Response-tuned models
+    for s in scripts/iclr2025/expt1_llama/res/finetune*e.sh; do bash $s; done
+
+The results are stored here:
+
+    for ep in 5 7 10 15 20; do
+      cat results/val_eval/limabaseline7Bep${ep}/weighted_alpaca_eval_gpt4_turbo/leaderboard.csv
+    done
+
+The `finetune_seed*.sh` files already have the epochs set to what worked best for our validation run,
+or you can update them based on your validation run. First run the instruction-tuning test runs:
+
+    for s in scripts/iclr2025/expt1_llama/ins/finetune_seed*; do bash $s; done
+
+It's important that these all complete first before running the response-tuning experiments,
+since the response-tuning experiments will run alpaca-eval head-to-head against the outputs
+from the corresponding seed of the instruction-tuning experiments.
+So, `finetune_seed1.sh` of the response-tuning experiments will compare against the outputs of
+seed 1 of instruction-tuning. You also have to edit the `res/finetune_seed*.sh` test results
+to point to the outputs of the test models if you changed the seed from what we set.
+
+Now run the response-tuning and evaluations:
+
+    for s in scripts/iclr2025/expt1_llama/res/finetune_seed*; do bash $s; done
+
+Now the results that we put in Table 1 (Llama-2-7B Win Rate vs. Instruction Tuning, 43.2%)
+should appear (up to randomness; these results aren't going to be identically replicable
+but should be replicable in distribution) at:
+
+    cat results/alpaca_farm/limaresponse7Bep5_seed*/weighted_alpaca_eval_gpt4_turbo/leaderboard.csv
+
+## Single-Task Finetuning
+The process for running the single-task finetuning experiments is largely the same as for the response-tuning
+experiments, just with different paths.
+
+First we run the valiation experiments:
+We use `gsm` here as an example (training on 1k of the Grade School Math 8k) experiments, but other options are `mbpp, pgn, poetry, recipe`. 
+
+    bash scripts/iclr2025/expt2_llama/gsm/finetune*e.sh
+
+    for ep in 5 7 10 15 20; do
+      cat results/val_eval/gsmbaseline7Bep${ep}/weighted_alpaca_eval_gpt4_turbo/leaderboard.csv
+    done
+
+And then run the test seeds (again after changing the epoch counts in the test scripts depending on your validation results):
+
+    for s in scripts/iclr2025/expt2_llama/gsm/finetune_seed*; do bash $s; done
+
+    cat results/alpaca_farm/gsmbaseline7Bep7_seed*/weighted_alpaca_eval_gpt4_turbo/leaderboard.csv
+
+Note that these test scripts must be run _after_ you ran the instruction-tuning test scripts from the response tuning
+section, since the evaluation scripts will compare the output of the GSM-trained models against the outputs of
+the instruction-tuned models.
+
+## Rule-Based Model
+
+To run our rule-base models, we'll call our generation script (which generates outputs from a model for a given set of instructions) with special flags that add the rules.
+
+    options=eos-uniform-diversity
+    model=meta-llama/Llama-2-7B-hf
+    python -m eval.alpaca_farm.run_eval \
+      --model_name_or_path ${model} \
+      --tokenizer_name_or_path ${model} \
+      --save_dir results/alpaca_farm/`basename ${model}`-rules-${options} \
+      --eval_batch_size 1 \
+      --use_chat_format \
+      --chat_formatting_function eval.templates.create_prompt_with_tulu_chat_format \
+      --add_rule_based_helper ${options}
+
+To run the ablations without some of the rules, set the options as, e.g., `eos-uniform` to remove the diversity rule.
+
+To evaluate these outputs, run, e.g.,
+
+    for s in 1 2 3 4 5; do
+      alpaca_eval \
+        --model_outputs results/alpaca_farm/Llama-2-7B-hf-rules-eos-uniform-diversity/Llama-2-7B-hf-greedy-long-output.json\
+        --reference_outputs results/alpaca_farm/limabaseline7Bep15_seed${s}/limabaseline7Bep15_seed${s}-greedy-long-output.json\
+        --output_path results/alpaca_farm/Llama-2-7B-hf-rules-eos-uniform-diversity/result_seed${s}
+    ; done
+
+This runs `alpaca_eval` against seed `s` of the instruction-tuned model.
+
+For our non-EOS models, we constrain to at most 512 new tokens with the flag `--max_new_tokens 512` (otherwise it takes forever since they largely don't stop generating.) This also improves their win rates.
+
+## Response Ranking Experiment (Section 4.2)
+
+Score real responses and random responses for each of three models:
+
+    for model in output/limabaseline7Bep15_seed1/ output/olmolima3e-6baseline7Bep15_seed1/ meta-llama/Llama-2-7B-hf allenai/OLMo-7B-hf; do  python open_instruct/ratio_eval.py --model_name_or_path ${model} --tokenizer_name output/limabaseline7Bep15_seed1/  --train_file data/processed/stanford_alpaca/stanford_alpaca_data.jsonl --max_seq_length 1024  --per_device_train_batch_size 1 --max_examples 1000 --output_path `echo $model | sed 's|/|-|g'`.jsonl; done
+
+Print response ranking percents:
+
+    python plot_ratios.py output-limabaseline7Bep15_seed1- 
+
+## Visualization of response similarity (Section 5.2)
+
+Assuming your test results are at the same place as indicated via the config files in this repository. (if not, edit the python file):
+
+    python open_instruct/plot_embeds.py gsm
+
+# (Forked From) Training Open Instruction-Following Language Models
+Below I leave the README from the forked repository, unchanged.
 
 This repo serves as an open effort on instruction-tuning popular pretrained language models on publicly available datasets. We release this repo and will keep updating it with:
 
