@@ -1,35 +1,5 @@
 #! /bin/bash
 
-
-__conda_setup="$('/u/scr/johnhew/miniconda3/' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/u/scr/johnhew/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/u/scr/johnhew/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/u/scr/johnhew/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-
-conda activate poi6
-
-export CUDA_VISIBLE_DEVICES=0,1
-#export CUDA_VISIBLE_DEVICES=0,1,2,3
-
-MODEL_SIZE=7B
-MODELNAME=response
-NUM_GPUS=2
-BATCH_SIZE_PER_GPU=1
-TOTAL_BATCH_SIZE=64
-GRADIENT_ACC_STEPS=$(($TOTAL_BATCH_SIZE/$NUM_GPUS/$BATCH_SIZE_PER_GPU))
-echo "Training llama model ${MODEL_SIZE} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_GPU batch size per GPU, $GRADIENT_ACC_STEPS gradient accumulation steps"
-
-# You can also set --gradient_checkpointing or use `stage3_offloading_accelerate.conf` to save memory, 
-# but it will trade off speed.
-
-DSNAME=lima3e-6-norephrase
 epochs=7
 seed=1
 model=olmo${DSNAME}${MODELNAME}${MODEL_SIZE}ep${epochs}_seed${seed}
