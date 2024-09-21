@@ -4,8 +4,8 @@
 This codebase is a fork of the [open-instruct](https://github.com/allenai/open-instruct) repository, modified to implement experiments in the paper _Instruction Following without Instruction Tuning._
 As such, it can be used for instruction tuning, though likely unless you're interested in the details of our experiments, you're better off using the original open-instruct repository.
 
-The core result of this work is that language models are just _prone to following instructions_, even when the adaptations we apply to them aren't traditional instruction tuning.
-Training on responses only (without any instructions) or training on a single-task distribution like poetry generation, both cause a language model to follow instructions.
+The core result of this work is that some adaptations (finetuning) to language models that don't _seem_ like instruction tuning still _implicitly_ instruction-tune the model, in the sense that the base model didn't follow instructions, and the adapted model roughly does.
+Training on responses only (without any instructions) or training on a single-task distribution like poetry generation, both yield instruction following.
 We even hand-write a 3-rule rule-based model that, in a product with a pretrained distribution, causes instruction following.
 
 These results were quite curious to us! You can use the scripts below to replicate our experiments.
@@ -18,7 +18,7 @@ Then below our notes is the original README for the open-instruction repository 
 ## Downloading and processing data.
 We use various transformed versions of datasets that have access restrictions (LIMA in particular) so there's a bit of a process to get the data.
 
-First, run `scripts/prepare_train_data.sh`, which will download hte LIMA and Stanford alpaca datasets. (For LIMA you'll need your `HF_TOKEN` set and approval on the dataset.)
+First, run `scripts/prepare_train_data.sh`, which will download the LIMA and Stanford alpaca datasets. (For LIMA you'll need your `HF_TOKEN` set and approval on the dataset.)
 
 Now create the no-instructions LIMA:
 
