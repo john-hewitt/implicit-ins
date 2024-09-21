@@ -12,7 +12,7 @@ These results were quite curious to us! You can use the scripts below to replica
 Then below our notes is the original README for the open-instruction repository when we forked it, for reference.
 
 <p align="center" width="100%">
-      <img src="images/fig1.png" alt="Training on responses only, or single-task distributions, or even using a rule-based adapter, all cause pretrained models to follow instructions." style="width: 20%; min-width: 200px; display: block; margin: auto;">
+      <img src="images/fig1.png" alt="Training on responses only, or single-task distributions, or even using a rule-based adapter, all cause pretrained models to follow instructions." style="min-width: 200px; display: block; margin: auto;">
 </p>
 
 ## Getting Started
