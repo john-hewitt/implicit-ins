@@ -15,6 +15,38 @@ Then below our notes is the original README for the open-instruction repository 
       <img src="images/fig1.png" alt="Training on responses only, or single-task distributions, or even using a rule-based adapter, all cause pretrained models to follow instructions." style="min-width: 200px; display: block; margin: auto;">
 </p>
 
+## Downloading and processing data.
+We use various transformed versions of datasets that have access restrictions (LIMA in particular) so there's a bit of a process to get the data.
+
+First, run `scripts/prepare_train_data.sh`, which will download hte LIMA and Stanford alpaca datasets. (For LIMA you'll need your `HF_TOKEN` set and approval on the dataset.)
+
+Now create the no-instructions LIMA:
+
+    cd data/processed/lima
+    python remove_instructions.py
+
+Now create the single-task finetuning datasets
+
+    # Grade School Math
+    cd ../gsm_train
+    python make_gsm.py
+
+    # Mostly Basic Python Programming
+    cd ../mbpp
+    python make_mbpp.py
+
+    # Recipes (https://huggingface.co/datasets/Hieu-Pham/kaggle_food_recipes)
+    cd ../kaggle_food_recipes
+    python make_kfr.py
+
+    # Chess (https://huggingface.co/datasets/patrickfrank1/chess-pgn-games)
+    cd ../pgn
+    python make_pgn.py
+
+    # Poetry (https://huggingface.co/datasets/merve/poetry)
+    cd ../poetry
+    python make_poetry.py
+
 ## Getting Started
 
 Make your preferred environment (I use miniconda) and then install some required packages:
