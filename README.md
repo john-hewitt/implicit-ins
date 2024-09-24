@@ -1,6 +1,8 @@
 
 # Instruction Following without Instruction Tuning
 
+This codebase contains the code for the paper _[Instruction Following without Instruction Tuning](https://arxiv.org/pdf/2409.14254)_, by John Hewitt, Nelson F. Liu, Christopher D. Manning, and Percy Liang.
+
 This codebase is a fork of the [open-instruct](https://github.com/allenai/open-instruct) repository, modified to implement experiments in the paper _Instruction Following without Instruction Tuning._
 As such, it can be used for instruction tuning, though likely unless you're interested in the details of our experiments, you're better off using the original open-instruct repository.
 
@@ -167,6 +169,45 @@ Print response ranking percents:
 Assuming your test results are at the same place as indicated via the config files in this repository. (if not, edit the python file):
 
     python open_instruct/plot_embeds.py gsm
+
+## Citation
+
+If you found this useful, please cite the papers for the original repository:
+
+```bibtex
+@misc{wang2023far,
+   title={How Far Can Camels Go? Exploring the State of Instruction Tuning on Open Resources}, 
+   author={Yizhong Wang and Hamish Ivison and Pradeep Dasigi and Jack Hessel and Tushar Khot and Khyathi Raghavi Chandu and David Wadden and Kelsey MacMillan and Noah A. Smith and Iz Beltagy and Hannaneh Hajishirzi},
+   year={2023},
+   eprint={2306.04751},
+   archivePrefix={arXiv},
+   primaryClass={cs.CL}
+}
+```
+
+```bibtex
+@misc{ivison2023camels,
+      title={Camels in a Changing Climate: Enhancing LM Adaptation with Tulu 2}, 
+      author={Hamish Ivison and Yizhong Wang and Valentina Pyatkin and Nathan Lambert and Matthew Peters and Pradeep Dasigi and Joel Jang and David Wadden and Noah A. Smith and Iz Beltagy and Hannaneh Hajishirzi},
+      year={2023},
+      eprint={2311.10702},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
+
+and feel free to cite our paper as well:
+
+@misc{hewitt2024instruction,
+   title={Instruction Following without Instruction Tuning}, 
+   author={John Hewitt and Nelson F. Liu and Christopher D. Manning and Percy Liang},
+   year={2024},
+   eprint={pdf/2409.14254},
+   archivePrefix={arXiv},
+   primaryClass={cs.CL}
+}
+```
+
 
 # (Forked From) Training Open Instruction-Following Language Models
 Below I leave the README from the forked repository, unchanged.
