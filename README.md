@@ -198,6 +198,7 @@ If you found this useful, please cite the papers for the original repository:
 
 and feel free to cite our paper as well:
 
+```
 @misc{hewitt2024instruction,
    title={Instruction Following without Instruction Tuning}, 
    author={John Hewitt and Nelson F. Liu and Christopher D. Manning and Percy Liang},
